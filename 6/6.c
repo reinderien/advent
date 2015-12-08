@@ -93,7 +93,7 @@ static int p2(FILE *f) {
 }
 
 int main() {
-    FILE *f = fopen("../6.in", "r");
+    FILE *f = fopen("6.in", "r");
     assert(f);
 
     printf("%d\n", p2(f));
