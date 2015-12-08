@@ -3,9 +3,7 @@
 from re import sub
 
 lines = [line.strip() for line in open('8.in').readlines()]
-
-total = sum(len(line.strip()) - len(eval(line))
-            for line in lines)
+total = sum(len(line.strip()) - len(eval(line)) for line in lines)
 print(total)  # 1350
 
 def escape(match):
