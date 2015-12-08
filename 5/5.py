@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# http://adventofcode.com/day/5
 
 from re import findall, search
 

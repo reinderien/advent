@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# http://adventofcode.com/day/1
 
 floor, basement = 0, False
 for p,i in enumerate(open('1.in').read()):

@@ -4,6 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+static void parse(int *x0, int *y0, int *x1, int *y1) {
+    char *rest;
+    for (rest = buffer; *rest < '0' || *rest > '9'; rest++);
+    rest[-1] = '\0';
+    assert(4 == sscanf(rest, "%d,%d through %d,%d", x0,y0,x1,y1));
+}
+
 // 377891
 static int p1(FILE *f) {
     bool **lights = (bool**)malloc(1000*sizeof(bool*)),
@@ -16,12 +23,7 @@ static int p1(FILE *f) {
     while (fgets(buffer, sizeof(buffer), f)) {
         const char *action = buffer;
         int x0,y0,x1,y1;
-        {
-            char *rest;
-            for (rest = buffer; *rest < '0' || *rest > '9'; rest++);
-            rest[-1] = '\0';
-            assert(4 == sscanf(rest, "%d,%d through %d,%d", &x0,&y0,&x1,&y1));
-        }
+        parse(&x0, &y0, &x1, &y1);
 
         if (!strcmp(action, "turn on"))
             for (int y = y0; y <= y1; y++)
@@ -56,12 +58,7 @@ static int p2(FILE *f) {
     while (fgets(buffer, sizeof(buffer), f)) {
         const char *action = buffer;
         int x0,y0,x1,y1;
-        {
-            char *rest;
-            for (rest = buffer; *rest < '0' || *rest > '9'; rest++);
-            rest[-1] = '\0';
-            assert(4 == sscanf(rest, "%d,%d through %d,%d", &x0,&y0,&x1,&y1));
-        }
+        parse(&x0, &y0, &x1, &y1);
 
         if (!strcmp(action, "turn on"))
             for (int y = y0; y <= y1; y++)

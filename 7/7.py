@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# http://adventofcode.com/day/7
 
 from collections import namedtuple
 
@@ -14,17 +13,14 @@ for line in open('7.in').readlines():
         b, (op, a, _, out) = None, parts
     elif len(parts) == 5:
         a, op, b, _, out = parts
-    else:
-        raise ValueError()
+    else: raise ValueError()
 
     try:
         if a is not None: a = int(a)
-    except ValueError:
-        pass
+    except ValueError: pass
     try:
         if b is not None: b = int(b)
-    except ValueError:
-        pass
+    except ValueError: pass
 
     gates[out] = Gate(op, a, b)
 orig_gates = dict(gates)
@@ -35,7 +31,6 @@ ops = {'EQ': lambda a, b: a,
        'OR': lambda a, b: a | b,
        'LSHIFT': lambda a, b: a << b,
        'RSHIFT': lambda a, b: a >> b}
-
 
 def recurse(out):
     gate = gates[out]

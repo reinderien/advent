@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# http://adventofcode.com/day/3
 
 houses = {(0,0)}
 deltas = {'>': (1,0), '<': (-1,0), '^': (0,1), 'v': (0,-1)}

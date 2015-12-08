@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# http://adventofcode.com/day/2
 
 paper, ribbon = 0,0
 for line in open('2.in').readlines():
