@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
-def p(N):
+from timeit import timeit
+
+N = 40  # 329356
+# N = 50  # 4666278
+
+def p():
     inputs = '3113322113'
     for n in range(N):
         prev, out, run = inputs[0], '', 1
@@ -12,5 +17,4 @@ def p(N):
         inputs = '%s%d%c' % (out, run, prev)
     print(len(inputs))
 
-p(40)  # 329356
-p(50)  # 4666278
+print('t=%.3f' % timeit(p, number=1))
