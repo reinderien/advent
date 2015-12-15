@@ -1,4 +1,6 @@
 import re
+from numpy.linalg import solve
+from numpy import array
 from scipy.optimize import minimize
 from unittest import TestCase
 
@@ -18,12 +20,15 @@ class Ingredient:
         return self.name
 
 
-def solve(ingredients):
+def solve1(ingredients):
+    def fill_dof(args):
+        return tuple(args) + (100-sum(args),)
+
     def objective(args):
         product = -1
         # Instead of having the degrees of freedom be the number of ingredients,
         # reduce that by one so that we can use COBYLA without an equality constraint
-        x = tuple(args) + (100-sum(args),)
+        x = fill_dof(args)
         for i_attr in range(4):
             total = sum(a*i.weights[i_attr] for a, i in zip(x, ingredients))
             product *= max(0, total)
@@ -38,7 +43,7 @@ def solve(ingredients):
     res = minimize(method='COBYLA', fun=objective, constraints=constraints, options={'disp': True},
                    x0=(100/len(ingredients),)*(len(ingredients)-1))
 
-    xres = tuple(res.x) + (100-sum(res.x),)
+    xres = fill_dof(res.x)
     print('%s: %f' % (xres, -res.fun))
 
     xres = [int(round(x)) for x in res.x]
@@ -52,9 +57,73 @@ test_ingredients = (
     Ingredient('Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3')
 )
 test = TestCase()
-# 62842880
-test.assertEqual(solve(test_ingredients), [44, 56])
-
+print('Test 1 should be 62842880:')
+test.assertEqual(solve1(test_ingredients), [44, 56])
+print('\nSoln 1 should be 13882464:')
 all_ingredients = tuple(Ingredient(line) for line in open('15.in').readlines())
-# 13882464
-solve(all_ingredients)
+solve1(all_ingredients)
+print()
+
+def solve2(ingredients):
+
+    def fill_dof(args, do_round=False):
+        """
+        Constraints: Each ingredient >= 0   (register as an ineq)
+                     Each ingredient <= 100 (register as an ineq)
+                     Sum of ingredients is 100 (use to reduce DOF)
+                     Total calories is 500 - you can cheat and use a fake inequality, i.e.
+                        epsilon - abs(500 - sum(x * cals)) > 0,
+                     and that works for the test case but not well enough for the real input.
+                     So, also use calorie requirement to reduce DOF.
+        """
+        a = array([[1, 1],
+                   [ingredients[-2].attrs['calories'], ingredients[-1].attrs['calories']]])
+        b = [100 - sum(args),
+             500 - sum(a*i.attrs['calories'] for a, i in zip(args, ingredients[:-2]))]
+        x = solve(a, b)
+        if do_round:
+            x = (int(round(v)) for v in x)
+
+        return tuple(args) + tuple(x)
+
+    def objective(args, do_round=False):
+        product = -1
+        # Instead of having the degrees of freedom be the number of ingredients,
+        # reduce that by one so that we can use COBYLA without an equality constraint
+        x = fill_dof(args, do_round)
+        for i_attr in range(4):
+            total = sum(a*i.weights[i_attr] for a, i in zip(x, ingredients))
+            product *= max(0, total)
+        return product
+
+    def cals(args):
+        return sum(a*i.attrs['calories'] for a, i in zip(args, ingredients))
+
+    # Use inequality constraints instead of bounds for COBYLA
+    constraints = [{'type': 'ineq', 'fun': lambda x: x[i]} for i in range(len(ingredients)-2)] + [
+                   {'type': 'ineq', 'fun': lambda x: 100-x[i]} for i in range(len(ingredients)-2)]
+
+    # Use COBYLA - constrained optimization by linear approximation, because
+    # SLSQP - sequential least-squares programming fails completely
+    res = minimize(method='COBYLA', fun=objective, constraints=constraints, options={'disp': True},
+                   x0=(100/len(ingredients),)*(len(ingredients)-2))
+
+    xres = fill_dof(res.x)
+    print('%s: score=%f cals=%f' % (xres, -res.fun, cals(xres)))
+    return xres
+
+print('Test 2 should be 57600000:')
+test.assertEqual(solve2(test_ingredients), (40, 60))
+
+print('\nSoln 2 should be ??:')
+all_ingredients = tuple(Ingredient(line) for line in open('15.in').readlines())
+'''
+11317920 is too high
+11237572 is too high
+Should be in the neighbourhood of:
+(26.371005138101477, 26.795687339254684, 16.658586605456371, 30.174720917187461): score=11249713.830296 cals=500.000000
+'''
+exact = solve2(all_ingredients)
+
+# Scipy/numpy are dumb and do not support integer linear programming.
+# BUT I CAN BE DUMBER.
