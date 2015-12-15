@@ -86,11 +86,10 @@ def solve2(ingredients):
 
         return tuple(args) + tuple(x)
 
-    def objective(args, do_round=False):
+    def objective(args, do_round=False, full=False):
         product = -1
-        # Instead of having the degrees of freedom be the number of ingredients,
-        # reduce that by one so that we can use COBYLA without an equality constraint
-        x = fill_dof(args, do_round)
+        if full: x = args
+        else: x = fill_dof(args, do_round)
         for i_attr in range(4):
             total = sum(a*i.weights[i_attr] for a, i in zip(x, ingredients))
             product *= max(0, total)
@@ -110,20 +109,33 @@ def solve2(ingredients):
 
     xres = fill_dof(res.x)
     print('%s: score=%f cals=%f' % (xres, -res.fun, cals(xres)))
-    return xres
+
+    # Scipy/numpy are dumb and do not support integer linear programming.
+    # BUT I CAN BE DUMBER.
+    base = [round(x) for x in xres]
+    best_score, best_x = 0, None
+    for d1 in range(-2,3):
+        for d2 in range(-2,3):
+            for d3 in range(-2,3):
+                b = (base[0]+d1,base[1]+d2,base[2]+d3)
+                b = b + (100 - sum(b),)
+                if cals(b) != 500: continue
+                score = -objective(b, full=True)
+                if best_score < score:
+                    best_score = score
+                    best_x = b
+    print('%s: score=%d' % (best_x, best_score))
+
+
 
 print('Test 2 should be 57600000:')
-test.assertEqual(solve2(test_ingredients), (40, 60))
+#test.assertEqual(solve2(test_ingredients), (40, 60))
 
-print('\nSoln 2 should be ??:')
+print('\nSoln 2 should be 11171160:')
 all_ingredients = tuple(Ingredient(line) for line in open('15.in').readlines())
 '''
-11317920 is too high
-11237572 is too high
 Should be in the neighbourhood of:
 (26.371005138101477, 26.795687339254684, 16.658586605456371, 30.174720917187461): score=11249713.830296 cals=500.000000
 '''
-exact = solve2(all_ingredients)
+solve2(all_ingredients)
 
-# Scipy/numpy are dumb and do not support integer linear programming.
-# BUT I CAN BE DUMBER.
