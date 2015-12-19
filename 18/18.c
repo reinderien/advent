@@ -32,6 +32,7 @@ int main() {
         for (int x = 1; x <= N; x++)
             state[y][x] = state[y][x] == '#';
     }
+    fclose(fin);
 
     for (int n = 0; n < 100; n++) {
         for (int y = 1; y <= N; y++) {
@@ -55,17 +56,17 @@ int main() {
         state = swap;
     }
 
+    free(state2);
+    free(block2);
+
     int total = 0;
     for (int y = 1; y <= N; y++)
         for (int x = 1; x <= N; x++)
             total += state[y][x];
     printf("%d\n", total);
 
-    fclose(fin);
-    free(block);
-    free(block2);
     free(state);
-    free(state2);
+    free(block);
 
     return 0;
 }
