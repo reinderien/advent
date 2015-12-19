@@ -27,19 +27,13 @@ int main() {
     assert(fin);
     for (int y = 1; y <= N; y++) {
         assert(fgets(state[y]+1, N+1, fin));
+        char consume_newline[2];
+        fgets(consume_newline, 2, fin);
         for (int x = 1; x <= N; x++)
             state[y][x] = state[y][x] == '#';
     }
 
-    for (int n = 0; n < 3; n++) {
-        for (int y = 0; y < N+2; y++) {
-            for (int x = 0; x < N+2; x++)
-                putchar(state[y][x] + '0');
-            putchar('\n');
-        }
-        putchar('\n');
-
-
+    for (int n = 0; n < 100; n++) {
         for (int y = 1; y <= N; y++) {
             for (int x = 1; x <= N; x++) {
                 int n_others =
