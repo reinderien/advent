@@ -13,13 +13,22 @@ def walk(part):
     visited = set()
     for d in dirs:
         facing = (facing + (1 if d[0] == 'L' else -1)) % 4
-        px += cardinals[facing][0]*d[1]
-        py += cardinals[facing][1]*d[1]
-        if part == 2:
-            if (px, py) in visited:
-                break
-            visited.add((px, py))
+        ux, uy = cardinals[facing][0], cardinals[facing][1]
+        if part == 1:
+            px += ux*d[1]
+            py += uy*d[1]
+        else:
+            # The fancy thing to do is store line endpoints, but let's be bad
+            for _ in range(d[1]):
+                px += ux
+                py += uy
+                if (px, py) in visited:
+                    break
+                visited.add((px, py))
+            else:
+                continue
+            break
     print(abs(px) + abs(py))
 
 walk(1)  # 161 - correct
-walk(2)  # 156 - incorrect
+walk(2)  # 110 - correct
