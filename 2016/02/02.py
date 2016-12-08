@@ -7,40 +7,32 @@ dirs = {
     'D': (0, 1)
 }
 
-print('Part 1:')
 
-digits = ('123',
-          '456',
-          '789')
+def solve(part):
+    if part == 1:
+        digits = ('     ',
+                  ' 123 ',
+                  ' 456 ',
+                  ' 789 ',
+                  '     ')
+    else:
+        digits = ('       ',
+                  '   1   ',
+                  '  234  ',
+                  ' 56789 ',
+                  '  ABC  ',
+                  '   D   ',
+                  '       ')
+    for line in open('02.in'):
+        y = int(len(digits)/2)
+        x = y
+        for c in line.strip():
+            dx, dy = dirs[c]
+            nx, ny = x+dx, y+dy
+            if digits[ny][nx] != ' ':
+                x, y = nx, ny
+        print(digits[y][x], end='')
+    print()
 
-for line in open('02.in'):
-    x, y = 1, 1
-    for c in line.strip():
-        dx, dy = dirs[c]
-        x, y = max(0, min(2, x+dx)), max(0, min(2, y+dy))
-    print(digits[y][x], end='')
-print()
-
-# 38961 - correct
-
-print('Part 2:')
-
-digits = (
-    '       ',
-    '   1   ',
-    '  234  ',
-    ' 56789 ',
-    '  ABC  ',
-    '   D   ',
-    '       '
-)
-
-for line in open('02.in'):
-    x, y = 3, 3
-    for c in line.strip():
-        dx, dy = dirs[c]
-        nx, ny = x+dx, y+dy
-        if digits[ny][nx] != ' ':
-            x, y = nx, ny
-    print(digits[y][x], end='')
-print()
+solve(1)  # 38961 - correct
+solve(2)  # 46C92 - correct
