@@ -5,7 +5,7 @@ import re
 cardinals = ((0, 1), (-1, 0), (0, -1), (1, 0))  # NWSE
 dirs = [(m.group(1), int(m.group(2)))
         for m in re.finditer(
-           r'(L|R)(\d+)(\D|$)', file('01.in').read())]
+           r'(L|R)(\d+)(\D|$)', open('01.in').read())]
 
 
 def walk(part):
