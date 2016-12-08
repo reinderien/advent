@@ -18,6 +18,6 @@ for line in open('04.in'):
         for c in name
     )
     if plaintext == 'northpole object storage':
-        print('#2: %d' % sect)
+        print('#2: %d' % sect)  # 482 - correct
 
 print('#1: %d' % sect_sum)  # 361724 - correct
