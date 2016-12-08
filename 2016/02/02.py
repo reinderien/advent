@@ -6,6 +6,9 @@ dirs = {
     'U': (0, -1),
     'D': (0, 1)
 }
+
+print('Part 1:')
+
 digits = ('123',
           '456',
           '789')
@@ -19,3 +22,25 @@ for line in open('02.in'):
 print()
 
 # 38961 - correct
+
+print('Part 2:')
+
+digits = (
+    '       ',
+    '   1   ',
+    '  234  ',
+    ' 56789 ',
+    '  ABC  ',
+    '   D   ',
+    '       '
+)
+
+for line in open('02.in'):
+    x, y = 3, 3
+    for c in line.strip():
+        dx, dy = dirs[c]
+        nx, ny = x+dx, y+dy
+        if digits[ny][nx] != ' ':
+            x, y = nx, ny
+    print(digits[y][x], end='')
+print()
