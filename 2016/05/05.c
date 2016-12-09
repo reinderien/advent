@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include "md5.h"
 
-static const uint32_t mask = 0xFFF00000;
+static const uint32_t mask = 0x00F0FFFF;
 static int nthreads;
 static int found = 0;
 
@@ -21,7 +21,7 @@ static void *md5_thread(void *pstart) {
         MD5_Final(&ctx);
 
         if (!(ctx.a & mask)) {
-            int digit = ctx.a >> 20;
+            int digit = (ctx.a >> 16) & 0xF;
             printf("%u: %X\n", found++, digit);
         }
         if (found >= 8)
