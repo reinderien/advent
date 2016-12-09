@@ -13,3 +13,5 @@ for line in open('06.in'):
 msg = ''.join(f.most_common(1)[0][0] for f in freqs)
 print(msg)  # qrqlznrl - Correct
 
+msg2 = ''.join(f.most_common()[-1][0] for f in freqs)
+print(msg2)
