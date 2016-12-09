@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# Broken; see C impl
+
 from hashlib import md5
 
 id = b'wtnhxymk'
