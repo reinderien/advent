@@ -3,7 +3,7 @@
 import re
 
 X, Y = 50, 6
-screen = [[False for x in range(X)] for y in range(Y)]
+screen = [[' ' for x in range(X)] for y in range(Y)]
 
 pat_rect = re.compile(r'^(rect) (\d+)x(\d+)$')
 pat_rotate_row = re.compile(r'^(rotate row) y=(\d+) by (\d+)$')
@@ -18,7 +18,8 @@ for line in open('08.in'):
 
     if cmd == 'rect':
         for y in range(b):
-            screen[y][:a] = [True]*a
+            screen[y][:a] = [''
+                             '*']*a
     elif cmd == 'rotate row':
         screen[a] = screen[a][-b:] + screen[a][:-b]
     elif cmd == 'rotate column':
@@ -28,6 +29,12 @@ for line in open('08.in'):
             screen[y][a] = col[y]
 
 
-pels = sum(p for row in screen for p in row)
+pels = sum(p=='*' for row in screen for p in row)
 print(pels)
 # 106 is correct
+
+for row in screen:
+    for p in row:
+        print(p, end='')
+    print()
+# CFLELOYFCS
