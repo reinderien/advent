@@ -45,15 +45,14 @@ def p2():
     """
 
     edges = [[1], [1], [1], [1,1]]
+    edge_c = [1]
     i_edge = 0
     while True:
         edge_p = edges[i_edge]
-        edge_c = []
+        edge_c = edge_c[-1:]
         edges[i_edge] = edge_c
-        for p in range(1+len(edge_p)):
-            total = sum(edge_p[max(0,p-1):p+2])
-            if edge_c:
-                total += edge_c[-1]
+        for p in range(len(edge_p)):
+            total = sum((edge_c[-1], *edge_p[p:p+3]))
             edge_c.append(total)
 
         i_edge = (i_edge+1) % 4
