@@ -2,6 +2,7 @@
 
 from math import sqrt
 
+i = 325489
 
 def p1():
     def coords(i):
@@ -29,7 +30,6 @@ def p1():
     assert(taxi(*coords(23)) == 2)
     assert(taxi(*coords(1024)) == 31)
 
-    i = 325489
     c = coords(i)
     d = taxi(*c)  # 552
     print('Part 1:')
@@ -53,6 +53,9 @@ def p2():
         edges[i_edge] = edge_c
         for p in range(len(edge_p)):
             total = sum((edge_c[-1], *edge_p[p:p+3]))
+            if total > i:
+                print('Part 2:', total)  # 330785
+                return
             edge_c.append(total)
 
         i_edge = (i_edge+1) % 4
