@@ -63,10 +63,21 @@ def check_tree(tree):
         print('      Own combined weight:', bad_weight)
         print('               Own weight:', bad_node.weight)
         print('    Own weight to balance:', others_weight - bad_weight + bad_node.weight)
-        raise EOFError()
+        raise EOFError()  # It's abhorrent, but it's an easy unwind
     return sum(weight_qs)
 
-test_input = '''pbga (66)
+
+def balance(title, tree):
+    print()
+    print(title + ':')
+
+    try:
+        check_tree(tree)
+    except EOFError:
+        pass
+
+test_tree = parse_tree(
+'''pbga (66)
 xhth (57)
 ebii (61)
 havc (66)
@@ -79,37 +90,23 @@ jptl (61)
 ugml (68) -> gyxo, ebii, jptl
 gyxo (61)
 cntj (57)
-'''.split('\n')
-test_tree = parse_tree(test_input)
+'''.split('\n'))
+assert(top(test_tree) == ('tknk',))
 
 with open('07.in') as f:
     file_tree = parse_tree(f)
-
-assert(top(test_tree) == ('tknk',))
 print('Part 1:', top(file_tree))  # mwzaxaj
-print()
 
-print('Part 2 test:')
-try:
-    check_tree(test_tree)
-except EOFError:
-    pass
-'''
-                     Name: ugml
+balance('Part 2 test', test_tree)
+'''                  Name: ugml
 Neighbour combined weight: 243
       Own combined weight: 251
                Own weight: 68
     Own weight to balance: 60
 '''
 
-print()
-print('Part 2:')
-try:
-    check_tree(file_tree)
-except EOFError:
-    pass
-'''
-                     Name: vrgxe
+balance('Part 2', file_tree)
+'''                  Name: vrgxe
 Neighbour combined weight: 2159
       Own combined weight: 2166
                Own weight: 1226
