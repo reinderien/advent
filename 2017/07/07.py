@@ -47,11 +47,11 @@ def check_tree(tree):
     if not tree:
         return 0
     weights = tuple((node.weight + check_tree(node.children), node)
-                     for node in tree.values())
+                    for node in tree.values())
     weight_qs = tuple(w[0] for w in weights)
     all_weights = set(weight_qs)
     if len(all_weights) != 1:
-        weight_counts = tuple(sorted((sum(1 for wc in weights if w==wc[0]), w)
+        weight_counts = tuple(sorted((sum(1 for wc in weights if w == wc[0]), w)
                                      for w in all_weights))
         bad_weight = weight_counts[0][1]
         others_weight = weight_counts[1][1]
