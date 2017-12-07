@@ -12,8 +12,6 @@ def coords(i):
     This is O(1), yaaay
     """
 
-    # Edge case
-
     w = ((sqrt(i-1)-1)//2)*2 + 1  # Width of inner square
     edge = (w+1)//2               # Max displacement from centre
     x = abs(w**2 + 2.5*w + 2.5 - i) - w - 1
@@ -38,3 +36,24 @@ print('Part 1:')
 print('i=%d x,y=(%d,%d) d=%d' % (i, *c, d))
 
 
+'''
+Part 2: Meh. Do the slow thing
+The infinite 2D space does not need to be represented in memory; only the previous and current 
+edges of the spiral.
+'''
+
+edges_p, edges_c = [[1], [1], [1], [1,1]], [None]*4
+i_edge = 0
+while True:
+    edge_c = []
+    edge_p = edges_p[i_edge]
+    edges_c[i_edge] = edge_c
+    for p in range(1+len(edge_p)):
+        total = sum(edge_p[max(0,p-1):p+2])
+        if edge_c:
+            total += edge_c[-1]
+        edge_c.append(total)
+
+    edges_p[i_edge] = edge_c
+    i_edge = (i_edge+1) % 4
+    edges_p[i_edge].insert(0, edge_c[-2])
