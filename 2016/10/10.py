@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 import re
+from functools import reduce
+from operator import mul
 
 
-def run(lines, chip1, chip2):
+def run(lines, part1, chip1=None, chip2=None):
     bots = {}
     outputs = {}
 
@@ -64,13 +66,17 @@ def run(lines, chip1, chip2):
             break
         source_bot = source_bots[0]
         lower_chip, higher_chip = sorted(source_bot.chips)
-        if lower_chip == chip1 and higher_chip == chip2:
-            return source_bot.id
         source_bot.chips.clear()
         source_bot.low_dest.chips.add(lower_chip)
         source_bot.hi_dest.chips.add(higher_chip)
+        if part1 and lower_chip == chip1 and higher_chip == chip2:
+            return source_bot.id
 
-    raise ValueError('Could not find the droid you are looking for')
+    if part1:
+        raise ValueError('Could not find the droid you are looking for')
+    return reduce(mul,
+                  (next(iter(outputs[id].chips)) for id in range(3)),
+                  1)
 
 
 test_text = \
@@ -80,7 +86,9 @@ value 3 goes to bot 1
 bot 1 gives low to output 1 and high to bot 0
 bot 0 gives low to output 2 and high to output 0
 value 2 goes to bot 2'''.split('\n')
-assert(run(test_text, 2, 5) == 2)
+assert(run(test_text, True, 2, 5) == 2)
 
 with open('10.in') as f:
-    print('Part 1:', run(f, 17, 61))  # 141
+    print('Part 1:', run(f, True, 17, 61))  # 141
+    f.seek(0)
+    print('Part 2:', run(f, False))  # 1209
