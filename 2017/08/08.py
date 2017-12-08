@@ -35,4 +35,4 @@ assert(test_highest == 10)
 with open('08.in') as f:
     file_regs, file_highest = run(f)
     print('Part 1:', p1(file_regs))  # 8022
-    print('Part 2:', file_highest)
+    print('Part 2:', file_highest)   # 9819
