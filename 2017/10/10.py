@@ -40,4 +40,8 @@ real_input = '34,88,2,222,254,93,150,0,199,255,39,32,137,136,1,167'
 assert(p1('3,4,1,5', 5) == 12)
 print('Part 1:', p1(real_input))  # 54675
 
+assert(p2('') == b'a2582a3a0e66e6e86e3812dcb672a272')
+assert(p2('AoC 2017') == b'33efeb34ea91902bb2f59c9920caa6cd')
+assert(p2('1,2,3') == b'3efbe78a8d82f29979031a4aa0b16a9d')
+assert(p2('1,2,4') == b'63960835bcdc130f0b66d7ff4f6a5a8e')
 print('Part 2:', p2(real_input))  # a7af2706aa9a09cf5d848c1e6605dd2a
