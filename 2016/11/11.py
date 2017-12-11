@@ -87,12 +87,14 @@ def run(fn):
 
     # @profile
     def bfs():
-        frontier = {initial_state}
+        frontier_set = {initial_state}
+        frontier_queue = deque((initial_state,))
         visited = set()
         paths = {}
         tick_time = time()
-        while frontier:
-            current = frontier.pop()
+        while frontier_set:
+            current = frontier_queue.popleft()
+            frontier_set.remove(current)
             if current == end_state:
                 path = []
                 while current:
@@ -101,16 +103,17 @@ def run(fn):
                 return path
             next_states_yielded = get_next_states(current)
             next_states_set = set(next_states_yielded)
-            next_states = next_states_set - visited - frontier
+            next_states = next_states_set - visited - frontier_set
             paths.update((n, current) for n in next_states)
-            frontier |= next_states
+            frontier_set |= next_states
+            frontier_queue.extend(next_states)
             visited.add(current)
 
             new_tick_time = time()
             if new_tick_time - tick_time >= 1:
                 tick_time = new_tick_time
                 print('Paths: %d  Visited: %d  Frontier: %d    ' %
-                      (len(paths), len(visited), len(frontier)), end='\r')
+                      (len(paths), len(visited), len(frontier_set)), end='\r')
 
     def results(path):
         print()
