@@ -14,12 +14,11 @@ def run(list_len, lengths):
 
 
 def p1(list_len, lengths):
+    lengths = [int(n) for n in lengths.split(',')]
     data = run(list_len, lengths)
-    print('Part 1:', data[0] * data[1])
+    return data[0] * data[1]
 
-real_input = (34,88,2,222,254,93,150,0,199,255,39,32,137,136,1,167)
+real_input = '34,88,2,222,254,93,150,0,199,255,39,32,137,136,1,167'
 
-print('Test:')  # 12
-p1(5, (3, 4, 1, 5))
-print('Real:')  # 54675
-p1(256, real_input)
+assert(p1(5, '3,4,1,5') == 12)
+print('Part 1:', p1(256, real_input))  # 54675
