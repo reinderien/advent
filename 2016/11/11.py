@@ -81,8 +81,8 @@ def run(fn):
                     carried_set = set(carried)
                     if verify_state(on_this_floor - carried_set) and \
                             verify_state(on_next_floor | carried_set):
-                        new_state = tuple(next_elev if o in carried_set else current[o]
-                                          for o in range(len(current)-1)) + (next_elev,)
+                        new_state = tuple(next_elev if o in carried_set else c
+                                          for o,c in enumerate(current[:-1])) + (next_elev,)
                         yield new_state
 
     # @profile
@@ -139,4 +139,4 @@ test_steps = run('11-test.in')
 assert(test_steps == 11)
 
 print('Part 1 ---')
-run('11.in')  # 35 is not correct
+run('11.in')  # 31
