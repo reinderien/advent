@@ -29,7 +29,7 @@ odd entries being the generator floors.
 
 def run(fn):
     elements = []
-    initial_state = [None]*10
+    initial_state = []
 
     def add_elements(line, rex, offset, floor):
         for e in rex.findall(line):
@@ -38,26 +38,30 @@ def run(fn):
             except ValueError:
                 at = len(elements)
                 elements.append(e)
-            initial_state[2*at + offset] = floor
+            index = 2*at + offset
+            while len(initial_state) < index+1:
+                initial_state.append(None)
+            initial_state[index] = floor
 
     def parse():
         re_chip = re.compile(r'\w+(?=-compatible microchip)')
         re_gen = re.compile(r'\w+(?= generator)')
         floor = 0
         with open(fn) as f:
-            for line in f:
-                add_elements(line, re_chip, 0, floor)
-                add_elements(line, re_gen, 1, floor)
-                floor += 1
+            floors = f.read().replace('\n', ' ').split('.')
+        for line in floors:
+            add_elements(line, re_chip, 0, floor)
+            add_elements(line, re_gen, 1, floor)
+            floor += 1
 
     def on_floor(state, floor):
         return set(o for o, f in enumerate(state[:-1]) if f == floor)
 
     # @profile
     def verify_state(on_this_floor):
-        unshielded_chips = any(True for c in on_this_floor if (not c&1) and
+        unshielded_chips = any(True for c in on_this_floor if (not c & 1) and
                                (c+1) not in on_this_floor)
-        has_gens = any(True for g in on_this_floor if g&1)
+        has_gens = any(True for g in on_this_floor if g & 1)
 
         return not (unshielded_chips and has_gens)
 
@@ -82,7 +86,7 @@ def run(fn):
                     if verify_state(on_this_floor - carried_set) and \
                             verify_state(on_next_floor | carried_set):
                         new_state = tuple(next_elev if o in carried_set else c
-                                          for o,c in enumerate(current[:-1])) + (next_elev,)
+                                          for o, c in enumerate(current[:-1])) + (next_elev,)
                         yield new_state
 
     # @profile
@@ -115,9 +119,13 @@ def run(fn):
                 print('Paths: %d  Visited: %d  Frontier: %d    ' %
                       (len(paths), len(visited), len(frontier_set)), end='\r')
 
+    def print_elements():
+        print(', '.join('{0:s} chip, {0:s} gen'.format(e)
+                        for e in elements)
+              + ', elevator')
+
     def results(path):
         print()
-        print_elements(elements)
         steps = len(path) - 1
         print('Steps:', steps)
         pprint(path)
@@ -126,17 +134,16 @@ def run(fn):
     parse()
     initial_state = (*initial_state[:2 * len(elements)], 0)  # add elevator
     end_state = (3,) * len(initial_state)
+    print_elements()
     return results(bfs())
 
-
-def print_elements(elements):
-    print(', '.join('{0:s} chip, {0:s} gen'.format(e)
-                    for e in elements)
-          + ', elevator')
 
 print('Part 1 test ---')
 test_steps = run('11-test.in')
 assert(test_steps == 11)
 
 print('Part 1 ---')
-run('11.in')  # 31
+run('11.1.in')  # 31; kind of slow
+
+print('Part 2 ---')
+run('11.2.in')  # 55; extremely slow
