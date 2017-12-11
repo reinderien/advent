@@ -53,6 +53,7 @@ def run(fn):
     def on_floor(state, floor):
         return set(o for o, f in enumerate(state[:-1]) if f == floor)
 
+    # @profile
     def verify_state(on_this_floor):
         unshielded_chips = any(True for c in on_this_floor if (not c&1) and
                                (c+1) not in on_this_floor)
@@ -60,6 +61,7 @@ def run(fn):
 
         return not (unshielded_chips and has_gens)
 
+    # @profile
     def get_next_states(current):
         current_elev = current[-1]
         next_elevs = set()
@@ -83,22 +85,25 @@ def run(fn):
                                           for o in range(len(current)-1)) + (next_elev,)
                         yield new_state
 
+    # @profile
     def bfs():
-        frontier = deque((initial_state,))
+        frontier = {initial_state}
         visited = set()
         paths = {}
         tick_time = time()
         while frontier:
-            current = frontier.popleft()
+            current = frontier.pop()
             if current == end_state:
                 path = []
                 while current:
                     path = [current] + path
                     current = paths.get(current)
                 return path
-            next_states = set(get_next_states(current)) - visited - set(frontier)
+            next_states_yielded = get_next_states(current)
+            next_states_set = set(next_states_yielded)
+            next_states = next_states_set - visited - frontier
             paths.update((n, current) for n in next_states)
-            frontier.extend(next_states)
+            frontier |= next_states
             visited.add(current)
 
             new_tick_time = time()
@@ -107,10 +112,18 @@ def run(fn):
                 print('Paths: %d  Visited: %d  Frontier: %d    ' %
                       (len(paths), len(visited), len(frontier)), end='\r')
 
+    def results(path):
+        print()
+        print_elements(elements)
+        steps = len(path) - 1
+        print('Steps:', steps)
+        pprint(path)
+        return steps
+
     parse()
     initial_state = (*initial_state[:2 * len(elements)], 0)  # add elevator
     end_state = (3,) * len(initial_state)
-    return elements, bfs()
+    return results(bfs())
 
 
 def print_elements(elements):
@@ -118,11 +131,9 @@ def print_elements(elements):
                     for e in elements)
           + ', elevator')
 
+print('Part 1 test ---')
+test_steps = run('11-test.in')
+assert(test_steps == 11)
 
-test_elements, test_result = run('11-test.in')
-print()
-print_elements(test_elements)
-pprint(test_result)
-assert(len(test_result)-1 == 11)
-
-# print('Part 1:', run('11.in'))
+print('Part 1 ---')
+run('11.in')  # 35 is not correct
