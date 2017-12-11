@@ -10,11 +10,16 @@ def run(list_len, lengths):
         data = data[delta:] + data[:delta]
         pos = (pos + delta) % list_len
         skip += 1
-    data = data[-pos:] + data[:-pos]
+    return data[-pos:] + data[:-pos]
+
+
+def p1(list_len, lengths):
+    data = run(list_len, lengths)
     print('Part 1:', data[0] * data[1])
 
+real_input = (34,88,2,222,254,93,150,0,199,255,39,32,137,136,1,167)
 
 print('Test:')  # 12
-run(5, (3, 4, 1, 5))
+p1(5, (3, 4, 1, 5))
 print('Real:')  # 54675
-run(256, (34,88,2,222,254,93,150,0,199,255,39,32,137,136,1,167))
+p1(256, real_input)
