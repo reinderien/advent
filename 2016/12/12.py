@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 
-def run(lines):
+def run(lines, second=False):
     regs = {}
+    if second:
+        regs['c'] = 1
     lines = tuple(l.rstrip() for l in lines)
     pc = 0
     while 0 <= pc < len(lines):
@@ -43,4 +45,5 @@ assert(run(test_input)['a'] == 42)
 
 with open('12.in') as f:
     print('Part 1:', run(f)['a'])  # 318117
-
+    f.seek(0)
+    print('Part 2:', run(f, second=True)['a'])  # 9227771 (slow)
