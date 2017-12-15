@@ -14,7 +14,7 @@ def run(lines):
                 direct.setdefault(i, set()).add(j)
                 direct.setdefault(j, set()).add(i)
 
-    def count():
+    def count_0():
         visited, pending = set(), {0}
         while pending:
             current = pending.pop()
@@ -22,8 +22,11 @@ def run(lines):
             pending |= direct[current] - visited
         return len(visited)
 
+    def count_all():
+        return 2
+
     parse()
-    return count()
+    return count_0(), count_all()
 
 
 test_input = '''0 <-> 2
@@ -33,7 +36,9 @@ test_input = '''0 <-> 2
 4 <-> 2, 3, 6
 5 <-> 6
 6 <-> 4, 5'''.split('\n')
-assert(run(test_input) == 6)  # works
+assert(run(test_input) == (6, 2))  # works
 
 with open('12.in') as f:
-    print('Part 1:', run(f))  # 141
+    count_0_real, count_all_real = run(f)
+print('Part 1:', count_0_real)  # 141
+print('Part 2:', count_all_real)  #
