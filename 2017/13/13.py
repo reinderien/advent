@@ -1,17 +1,28 @@
 #!/usr/bin/env python3
 
+from itertools import count
+
 
 def run(fname):
-    sev = 0
     with open(fname) as f:
-        for line in f:
-            t, s_range = (int(i) for i in line.rstrip().split(': '))
+        scanners = tuple(tuple(int(i) for i in line.rstrip().split(': '))
+                         for line in f)
+
+    def get_sev(delay=0):
+        sev = 0
+        for t, s_range in scanners:
             r = s_range-1
-            scanner = r - abs(r - t%(2*r))
+            scanner = r - abs(r - (t+delay) % (2*r))
             if scanner == 0:
                 sev += s_range*t
-    return sev
+        return sev
 
-assert(run('13.test.in') == 24)
-print('Part 1:', run('13.in'))  # 1612
+    def dodge():
+        for delay in count():
+            if get_sev(delay) == 0:
+                return delay
 
+    return get_sev(), dodge()
+
+assert(run('13.test.in') == (24, 10))
+print('Parts 1, 2:', run('13.in'))  # 1612
