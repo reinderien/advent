@@ -35,7 +35,7 @@ def p1(hashes):
     return used
 
 
-def p2(hashes, show=False):
+def p2(hashes):
     # 128^2 * 64 bytes per tuple of two ints. Worst case on the order of 1MB.
     # Submit all complaints to /dev/null.
     used_coords = {
