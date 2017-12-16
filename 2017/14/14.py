@@ -35,12 +35,37 @@ def p1(hashes):
     return used
 
 
-def p2(hashes):
-    pass
+def p2(hashes, show=False):
+    # 128^2 * 64 bytes per tuple of two ints. Worst case on the order of 1MB.
+    # Submit all complaints to /dev/null.
+    used_coords = {
+        (bit + 8*x, y)
+        for y, row in enumerate(hashes)
+        for x, byte in enumerate(row)
+        for bit in range(8)
+        if (byte >> (7 - bit)) & 1
+    }
+
+    n_groups = 0
+    deltas = ((-1, 0), (0, -1),
+              ( 1, 0), (0,  1))
+
+    def recurse(x, y):
+        for dx, dy in deltas:
+            new = (x+dx, y+dy)
+            if new in used_coords:
+                used_coords.remove(new)
+                recurse(*new)
+
+    while used_coords:
+        current = used_coords.pop()
+        recurse(*current)
+        n_groups += 1
+    return n_groups
 
 test_hashes = get_hashes('flqrgnkx')
 real_hashes = get_hashes('hwlqcszp')
 assert(p1(test_hashes) == 8108)
 print('Part 1:', p1(real_hashes))  # 8304
 assert(p2(test_hashes) == 1242)
-print('Part 2:', p2(real_hashes))  #
+print('Part 2:', p2(real_hashes))  # 1018
