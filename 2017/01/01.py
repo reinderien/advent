@@ -6,6 +6,6 @@ def count(off):
                if x == digits[(i + off) % len(digits)])
 
 with open('01.in') as f:
-    digits = [ord(c) - ord('0') for c in f.read()]
+    digits = [int(c) for c in f.read()]
 print('Part 1:', count(1))  # 1150
 print('Part 2:', count(len(digits)//2))  # 1064
