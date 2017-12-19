@@ -10,4 +10,4 @@ def run(pitch):
     return seq[(pos + 2) % len(seq)]
 
 assert(run(3) == 638)
-print('Part 1:', run(369))
+print('Part 1:', run(369))  # 1547
