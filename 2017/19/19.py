@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from itertools import chain
+from itertools import count
 
 
 def run(fname):
@@ -13,7 +13,7 @@ def run(fname):
     coord = (lines[0].find('|'), 0)
     found = ''
 
-    while True:
+    for steps in count(1):
         xo, yo = coord
         dirs = ((i+old_dir_i)%4 for i in (0,1,3))
         for dir_i in dirs:
@@ -23,12 +23,12 @@ def run(fname):
             if c != ' ':
                 break
         else:
-            return found
+            return found, steps
         old_dir_i = dir_i
         coord = x,y
         if c.isalpha():
             found += c
 
 
-assert(run('19.test.in') == 'ABCDEF')
-print('Part 1:', run('19.in'))
+assert(run('19.test.in') == ('ABCDEF', 38))
+print('Parts 1 and 2:', run('19.in'))  # 'GEPYAWTMLK', 17628
