@@ -15,13 +15,6 @@ class Point:
         self.a = tuple(int(i) for i in nums[6:])
         self.a_abs = sum(abs(i) for i in self.a)
 
-    def __str__(self):
-        return 'p=<%s>, v=<%s>, a=<%s>' % (
-            ','.join(str(p) for p in self.p),
-            ','.join(str(v) for v in self.v),
-            ','.join(str(a) for a in self.a)
-        )
-
     def tick(self):
         for i,a in enumerate(self.a):
             v = self.v[i]
