@@ -21,7 +21,7 @@ def p1(fname):
       min[lim t→∞ ∑ | p_i + ∫v_i dt + ∫∫a_i dt |
                  i=0
            2
-    ~ min[ ∑ a_i ]
+    ~ min[ ∑ |a_i| ]
           i=0
     """
     with open(fname) as f:
