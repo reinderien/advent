@@ -49,9 +49,17 @@ class PermState:
         self.inds = [(i+self.n-self.off)%self.n for i in self.inds]
         self.off = 0
 
+    @staticmethod
+    def to_str(tup):
+        return ''.join(chr(v+ord('a')) for v in tup)
+
     @property
     def val_str(self):
-        return ''.join(chr(v+ord('a')) for v in self.vals)
+        return PermState.to_str(self.vals)
+
+    @property
+    def ind_str(self):
+        return PermState.to_str(self.inds)
 
 
 def p1(text, n):
@@ -65,7 +73,7 @@ def p2(state):
     for _ in range(100):
         state.churn()
         state.normalize()
-        print(state.val_str)
+        print(state.val_str, state.ind_str)
 
 assert(p1('s1,x3/4,pe/b', 5).val_str == 'baedc')
 with open('16.in') as f:
