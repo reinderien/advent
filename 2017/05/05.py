@@ -22,4 +22,6 @@ assert(run(example, first=False) == 10)
 with open('05.in') as f:
     file_offsets = tuple(int(line) for line in f)
 print('Part 1:', run(file_offsets, first=True))   # 376976
-print('Part 2:', run(file_offsets, first=False))  # 29227751 (slow)
+
+# See C impl
+# print('Part 2:', run(file_offsets, first=False))  # 29227751 (slow)
