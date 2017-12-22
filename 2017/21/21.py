@@ -39,14 +39,12 @@ def churn(pattern, rules):
 
     new_pat = []
     for ymaj in range(n//chunksz):
-        new_lines = None
+        new_lines = [[] for _ in range(chunksz+1)]
         for xmaj in range(n//chunksz):
             chunk = tuple(tuple(pattern[ymaj*chunksz + ymin]
                                        [xmaj*chunksz : (xmaj+1)*chunksz])
                           for ymin in range(chunksz))
             new_chunk = rules[chunk]
-            if new_lines is None:
-                new_lines = tuple([] for _ in new_chunk)
             for ymin, subline in enumerate(new_chunk):
                 new_lines[ymin].extend(subline)
         new_pat.extend(new_lines)
