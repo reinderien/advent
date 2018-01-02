@@ -58,4 +58,4 @@ def run(p2=False):
     return n_mul
 
 print('Part 1:', run(p2=False))  # 4225
-print('Part 2:', run(p2=True))   #
+# print('Part 2:', run(p2=True)) # don't do this, it's too slow
