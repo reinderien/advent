@@ -2,7 +2,7 @@
 
 export
 
-cflags=-O3 -march=native -fomit-frame-pointer -Wall -Wno-unused-label --std=c99
+cflags=-O3 -march=native -fomit-frame-pointer -Wall --std=c99
 
 23_2: 23_2.o
 	gcc $$cflags -o $@ $<
