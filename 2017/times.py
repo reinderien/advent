@@ -5,7 +5,7 @@ from subprocess import check_call
 from pprint import pprint
 
 cmds = [(i, '{:02d}.py'.format(i)) for i in (
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 19, 20
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 19, 20, 23
 )] + [( 5, '05_2'),
       (16, '16_1.py'),
       (16, '16_2.py'),
