@@ -13,8 +13,7 @@ def run(fname):
             graph[b].add(a)
 
     def recurse(visited, left=0):
-        all_rights = graph[left]
-        next_pairs = {(left, right) for right in all_rights} - visited
+        next_pairs = {(left, right) for right in graph[left]} - visited
         if not next_pairs:
             return 0
         return left + max(pair[1] + recurse(visited | {pair, pair[::-1]}, pair[1])
@@ -22,4 +21,4 @@ def run(fname):
     return recurse(set())
 
 assert(run('24.test.in') == 31)
-print('Part 1:', run('24.in'))
+print('Part 1:', run('24.in'))  # 1859
