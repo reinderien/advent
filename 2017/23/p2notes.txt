@@ -71,9 +71,9 @@ Adding early loop termination on f, this is in turn equivalent to:
 
     int h = 0;
 
-    for (int b = 106700; b != 123700; b += 17) {
-        for (int d = 2; d != b; d++) {
-            for (int e = 2; e != b; e++) {
+    for (int b = 106700; b <= 123700; b += 17) {
+        for (int d = 2; d < b; d++) {
+            for (int e = 2; e < b; e++) {
                 if (d*e == b) {
                     h++;
                     goto cont;
@@ -86,17 +86,17 @@ Adding early loop termination on f, this is in turn equivalent to:
 We can now see what the code is doing. Variable purposes:
 
   a - Flag as to whether we're in part 1 (=0) or part 2 (=1)
-  b - Outermost loop counter, checked if prime
+  b - Outermost loop counter, checked if non-prime
   c - Upper value for b after which the outer loop terminates
   d - Next-inner loop counter, test factor 1
   e - Innermost loop counter, test factor 2
   f - Flag to indicate whether any factors have been found (=0) or whether b is prime (=1)
   g - Temporary variable for various calculations
-  h - Counter to track number of primes found over program execution
+  h - Counter to track number of non-primes found over program execution
 
 The innermost match is a brute-force check whether b is prime. If b is prime, there will be no pair
-of factors d and e for which their product equals b; f will never be cleared, and h will be
+of factors d and e for which their product equals b; f will never be cleared, and h will not be
 incremented. If b is non-prime, a pair of factors d and e will be found for which their product
-equals b; f will be cleared, and h will not be incremented.
+equals b; f will be cleared, and h will be incremented.
 
-The real solution is to rewrite this as a saner prime-finding loop.
+The real solution is to rewrite this as a saner prime-finding loop, with a Sieve of Eratosthenes.
