@@ -12,22 +12,15 @@ def run(fname):
             graph[a].add(b)
             graph[b].add(a)
 
-    best = 0
-
-    def recurse(visited, current=0, total=0):
+    def recurse(visited, current=0):
         visited = set(visited)
         visited.add(current)
         to_visit = graph[current] - visited
-        total += current
         if not to_visit:
-            nonlocal best
-            best = max(best, total)
-        total += current
-        for next_node in to_visit:
-            recurse(visited, next_node, total)
-
-    recurse(set())
-    return best
+            return current
+        return 2*current + max(recurse(visited, next_node)
+                               for next_node in to_visit)
+    return recurse(set())
 
 assert(run('24.test.in') == 31)
 print('Part 1:', run('24.in'))  # 1281 is too low
