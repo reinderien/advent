@@ -4,23 +4,22 @@ from collections import defaultdict
 
 
 def run(fname):
+    # Lines ("parts") are unique regardless of orientation.
     graph = defaultdict(set)
-
     with open(fname) as f:
         for line in f:
             a, b = (int(n) for n in line.split('/'))
             graph[a].add(b)
             graph[b].add(a)
 
-    def recurse(visited, current=0):
-        visited = set(visited)
-        visited.add(current)
-        to_visit = graph[current] - visited
-        if not to_visit:
-            return current
-        return 2*current + max(recurse(visited, next_node)
-                               for next_node in to_visit)
+    def recurse(visited, left=0):
+        all_rights = graph[left]
+        next_pairs = {(left, right) for right in all_rights} - visited
+        if not next_pairs:
+            return 0
+        return left + max(pair[1] + recurse(visited | {pair, pair[::-1]}, pair[1])
+                          for pair in next_pairs)
     return recurse(set())
 
 assert(run('24.test.in') == 31)
-print('Part 1:', run('24.in'))  # 1281 is too low
+print('Part 1:', run('24.in'))
