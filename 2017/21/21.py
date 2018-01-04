@@ -60,4 +60,5 @@ def run(fname, iters):
 
 
 assert(run('21.test.in', 2) == 12)
-print('Part 1:', run('21.in', 5))  # 142
+print('Part 1:', run('21.in',  5))  # 142
+print('Part 2:', run('21.in', 18))  # 1879071
