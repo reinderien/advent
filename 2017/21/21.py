@@ -28,26 +28,24 @@ def get_rules(fname):
     return rules
 
 
-def churn(pattern, rules):
-    n = len(pattern)
-    if not (n & 2):
-        chunksz = 2
-    elif not (n % 3):
-        chunksz = 3
+def churn(old_pat, rules):
+    old_n = len(old_pat)
+    if not (old_n % 2):
+        old_chunk_sz, new_chunk_sz = 2, 3
+    elif not (old_n % 3):
+        old_chunk_sz, new_chunk_sz = 3, 4
     else:
         raise ValueError('Bad pattern size')
+    new_n = old_n*new_chunk_sz // old_chunk_sz
 
-    new_pat = []
-    for ymaj in range(n//chunksz):
-        new_lines = [[] for _ in range(chunksz+1)]
-        for xmaj in range(n//chunksz):
-            chunk = tuple(tuple(pattern[ymaj*chunksz + ymin]
-                                       [xmaj*chunksz : (xmaj+1)*chunksz])
-                          for ymin in range(chunksz))
-            new_chunk = rules[chunk]
-            for ymin, subline in enumerate(new_chunk):
-                new_lines[ymin].extend(subline)
-        new_pat.extend(new_lines)
+    new_pat = [[] for _ in range(new_n)]
+    for ymaj in range(old_n//old_chunk_sz):
+        for xmaj in range(old_n//old_chunk_sz):
+            old_chunk = tuple(tuple(old_pat[ymaj*old_chunk_sz + ymin]
+                                           [xmaj*old_chunk_sz : (xmaj+1)*old_chunk_sz])
+                              for ymin in range(old_chunk_sz))
+            for ymin, subline in enumerate(rules[old_chunk]):
+                new_pat[ymaj*new_chunk_sz + ymin].extend(subline)
     return new_pat
 
 
@@ -58,9 +56,8 @@ def run(fname, iters):
                             '###'))
     for _ in range(iters):
         pattern = churn(pattern, rules)
-
-    return sum(sum(c for c in row) for row in pattern)
+    return sum(sum(row) for row in pattern)
 
 
 assert(run('21.test.in', 2) == 12)
-print('Part 1:', run('21.in', 5))  # 124 is too low
+print('Part 1:', run('21.in', 5))  # 142
