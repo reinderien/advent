@@ -26,11 +26,11 @@ def run(salt):
         return m.hexdigest()
 
     def add_quint(ind, md):
-        match = re_quint.search(md)
-        if match:
+        mat = re_quint.search(md)
+        if mat:
             q = Quint()
             q.index = ind
-            q.letter = match.group(1)
+            q.letter = mat.group(1)
             quints_q.append(q)
             quints_d[q.letter].add(q)
 
@@ -42,7 +42,7 @@ def run(salt):
     for index in count():
         while quints_q:          # purge old quints
             oldest = next(iter(quints_q))
-            if oldest.index >= index:
+            if oldest.index > index:
                 break
             quints_q.popleft()
             quints_d[oldest.letter].remove(oldest)
@@ -59,4 +59,4 @@ def run(salt):
                 return index  # index of 64th key
 
 assert(run('abc') == 22728)
-print('Part 1:', run('jlmsuwbz'))
+print('Part 1:', run('jlmsuwbz'))  # 35186
