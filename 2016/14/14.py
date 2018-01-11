@@ -70,5 +70,5 @@ def run(salt, p2=False):
 real = 'jlmsuwbz'
 assert(run('abc') == 22728)
 print('Part 1:', run(real))  # 35186
-assert(run('abc', p2=True) == 22859)
-print('Part 2:', run(real, p2=True))  # ...
+assert(run('abc', p2=True) == 22551)
+print('Part 2:', run(real, p2=True))  # 22429
