@@ -10,7 +10,7 @@ class Quint:
     __slots__ = ('index', 'letter')
 
 
-def run(salt):
+def run(salt, p2=False):
     re_triple = re.compile(r'(.)\1{2}')  # Three hexits in a row
     re_quint = re.compile(r'(.)\1{4}')   # Five hexits in a row
     quints_q = deque()           # Queue of quintuples among next 1000 hashes
@@ -21,9 +21,14 @@ def run(salt):
     base_hash.update(salt.encode('ascii'))
 
     def get_hash(ind):
+        rounds = 2017 if p2 else 1
         m = base_hash.copy()
-        m.update(str(ind).encode('ascii'))
-        return m.hexdigest()
+        inp = str(ind)
+        for _ in range(rounds):
+            m.update(inp.encode('ascii'))
+            inp = m.hexdigest()
+            m = md5()
+        return inp
 
     def add_quint(ind, md):
         mat = re_quint.search(md)
@@ -56,7 +61,14 @@ def run(salt):
         if match and quints_d[match.group(1)]:  # look for quint matches
             keys += 1         # one more key is found
             if keys == 64:    # bail on 64th key
+                print()
                 return index  # index of 64th key
 
+        if not (index & 0xFF):
+            print(str(index), end='\r')
+
+real = 'jlmsuwbz'
 assert(run('abc') == 22728)
-print('Part 1:', run('jlmsuwbz'))  # 35186
+print('Part 1:', run(real))  # 35186
+assert(run('abc', p2=True) == 22859)
+print('Part 2:', run(real, p2=True))  # ...
