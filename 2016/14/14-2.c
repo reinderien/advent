@@ -134,17 +134,22 @@ static void md5_to_hex(const md5_context *ctx, char *hex) {
 }
 
 int main() {
-    char hex[33] = "abc0";
-    int len = 4;
-    for (int i = 0; i < 2017; i++) {
-        md5_context ctx = md5_init;
-        md5_update(&ctx, (uint8_t*)hex, len);
-        md5_finish(&ctx);
-        md5_to_hex(&ctx, hex);
-        len = 32;
+    md5_context root_ctx = md5_init;
+    md5_update(&root_ctx, (uint8_t*)"abc", 3);
+
+    for (unsigned i = 0; i < 1000; i++) {
+        char hex[33];
+        int len = snprintf(hex, 33, "%u", i);
+        md5_context ctx = root_ctx;
+        for (unsigned r = 0; r < 2017; r++) {
+            md5_update(&ctx, (uint8_t*)hex, len);
+            md5_finish(&ctx);
+            md5_to_hex(&ctx, hex);
+            len = 32;
+            ctx = md5_init;
+        }
+        if (!i)
+            puts(hex);
     }
-
-    puts(hex);
-
     return 0;
 }
