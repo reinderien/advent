@@ -2,8 +2,11 @@
 // https://tls.mbed.org/md5-source-code
 
 #include <assert.h>
+#include <pthread.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // Assume little-endian 64-bit machine
@@ -121,7 +124,11 @@ static void md5_finish(md5_context *ctx) {
 }
 
 static char dec2hex(uint8_t d) {
-    return d + (d > 9 ? 'a'-10 : '0');
+    return d + (d >= 10 ? 'a'-10 : '0');
+}
+
+static uint8_t hex2dec(char h) {
+    return h - (h >= 'a' ? 'a'-10 : '0');
 }
 
 static void md5_to_hex(const md5_context *ctx, char *hex) {
@@ -133,14 +140,65 @@ static void md5_to_hex(const md5_context *ctx, char *hex) {
     hex[32] = '\0';
 }
 
-int main() {
-    md5_context root_ctx = md5_init;
-    md5_update(&root_ctx, (uint8_t*)"abc", 3);
+static char get_repeat(const char (*hex)[33], unsigned n) {
+    int run;
+    for (int start = 0;; start += run) {
+        char first = (*hex)[start];
+        for (run = 1;; run++) {
+            if (run >= n)
+                return first;
+            if (start + run >= 32)
+                return 0;
+            if ((*hex)[start + run] != first)
+                break;
+        }
+    }
+}
 
-    for (unsigned i = 0; i < 1000; i++) {
+
+typedef struct {
+    unsigned index;
+    uint8_t hexit;
+} matched_hash;
+
+typedef struct {
+    unsigned i_first, i_last, n;
+    matched_hash queue[1000];
+} circular;
+circular quints, triples;
+
+static md5_context root_ctx;
+
+// Positions in circular buffers
+unsigned first_index = 0, last_index = 0, keys_found = 0;
+
+static unsigned quint_counts[16] = { 0 };
+
+static char push(circular *buf, const char (*hex)[33], unsigned n) {
+    char repeat = get_repeat(hex, n);
+    if (!repeat) return -1;
+    matched_hash m = {last_index, hex2dec(repeat)};
+    buf->queue[buf->i_last] = m;
+    buf->i_last = (buf->i_last + 1) % 1000;
+    buf->n++;
+    return m.hexit;
+}
+
+static char pop(circular *buf) {
+    matched_hash m = buf->queue[buf->i_first];
+    first_index = m.index;
+    buf->i_first = (buf->i_first + 1) % 1000;
+    buf->n--;
+    return m.hexit;
+}
+
+static void produce() {
+    // As long as the distance between the first and last index is smaller
+    // than 1000, populate.
+    for (; last_index - first_index < 1000; last_index++) {
         char hex[33];
-        int len = snprintf(hex, 33, "%u", i);
         md5_context ctx = root_ctx;
+        int len = snprintf(hex, 33, "%u", last_index);
         for (unsigned r = 0; r < 2017; r++) {
             md5_update(&ctx, (uint8_t*)hex, len);
             md5_finish(&ctx);
@@ -148,8 +206,52 @@ int main() {
             len = 32;
             ctx = md5_init;
         }
-        if (!i)
-            puts(hex);
+        push(&triples, &hex, 3);
+        char repeat = push(&quints, &hex, 5);
+        if (repeat)
+            quint_counts[(int)repeat]++;
     }
+}
+
+static void consume() {
+    // Advance the first index through triples until the current triple does
+    // not have enough of a queue ahead of it, or there are no more triples.
+    for (;;) {
+        unsigned advance_to;
+        if (!triples.n)
+            advance_to = last_index;
+        else
+            advance_to = triples.queue[triples.i_first].index;
+        for (; first_index < advance_to;) {
+            // Clear out old quints
+            if (quints.n)
+                quint_counts[(int)pop(&quints)]--;
+            else
+                first_index = advance_to;
+        }
+        if (last_index - first_index < 1000)
+            return;
+
+        // Consume oldest triple
+        if (quint_counts[(int)pop(&triples)]) {
+            keys_found++;
+            if (keys_found >= 64) {
+                printf("%u\n", first_index);
+                exit(0);
+            }
+        }
+    }
+}
+
+int main() {
+    // Set up root hash context: always used before updating with index
+    root_ctx = md5_init;
+    md5_update(&root_ctx, (uint8_t*)"abc", 3);
+
+    for (;;) {
+        produce();
+        consume();
+    }
+
     return 0;
 }
