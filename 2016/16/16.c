@@ -97,21 +97,21 @@ static void checksum(const Fill *restrict f)
     {
         const uint64_t *din = in_dat;
         unsigned bin = 0, bin_total = 0;
-        for (uint64_t *dout = cs;; dout++)
+        for (uint64_t *dout = cs; bin_total < in_len; dout++)
         {
+            uint64_t new_dout = 0;
             for (unsigned bout = 0; bout < 64; bout++)
             {
                 uint64_t bit = !((
                                      (*din >> bin) & 1
                                  ) ^ (
                                      (*din >> (bin+1)) & 1
-                                 )),
-                         mask = 1 << bout;
-                *dout = (*dout & ~mask) | (bit << bout);
+                                 ));
+                new_dout |= bit << bout;
 
                 bin_total += 2;
                 if (bin_total >= in_len)
-                    goto done;
+                    break;
 
                 bin += 2;
                 if (bin >= 64)
@@ -120,8 +120,8 @@ static void checksum(const Fill *restrict f)
                     din++;
                 }
             }
+            *dout = new_dout;
         }
-        done:
         out_len = in_len/2;
         printf("CS: ");
         pretty_bin(cs, out_len);
@@ -130,7 +130,6 @@ static void checksum(const Fill *restrict f)
         in_dat = cs;
         in_len = out_len;
     } while (!(out_len & 1));
-
 }
 
 int main()
