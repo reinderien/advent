@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define DISK_BITS 272
+#define DISK_BITS 20 // 272 // our input
 #define DISK_QUADS (DISK_BITS/64 + 1)
 
 
@@ -44,13 +44,13 @@ static void fill_churn(Fill *restrict f)
 
     f->len = b_tail+1;
 
-    unsigned b_head = tail_end - b_tail;   // Offset of head
-    uint64_t m_head = 1 << (b_head % 64);  // Mask in head quad
-    const uint64_t *d_head = f->data;      // Head data pointer
+    unsigned b_head = tail_end - b_tail;           // Offset of head
+    uint64_t m_head = 1 << (b_head % 64);          // Mask in head quad
+    const uint64_t *d_head = f->data + b_head/64;  // Head data pointer
 
     for (; b_head < b_tail; b_head++, b_tail--)
     {
-        *d_tail |= (!(*d_head & m_head)) << o_tail;
+        *d_tail |= ((uint64_t)!(*d_head & m_head)) << o_tail;
 
         m_head <<= 1;
         if (!m_head)
@@ -66,7 +66,6 @@ static void fill_churn(Fill *restrict f)
             d_tail--;
         }
     }
-
 }
 
 static void pretty_bin(const Fill *f)
@@ -91,7 +90,7 @@ static void pretty_bin(const Fill *f)
 int main()
 {
     Fill fill;
-    const char *input = "10001001100000001";
+    const char *input = "10000"; // "10001001100000001"; // our input
     init_fill(&fill, input);
 
     printf("Disk bits: %u\n", DISK_BITS);
