@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define DISK_BITS 20 // 272 // our input
+#define DISK_BITS 272 // our input; use 20 to test
 #define DISK_QUADS (DISK_BITS/64 + 1)
 
 
@@ -68,16 +68,16 @@ static void fill_churn(Fill *restrict f)
     }
 }
 
-static void pretty_bin(const Fill *f)
+static void pretty_bin(const uint64_t *restrict data, unsigned len)
 {
     unsigned btot = 0;
-    for (const uint8_t *d = (const uint8_t*)f->data;; d++)
+    for (const uint8_t *d = (const uint8_t*)data;; d++)
     {
         for (unsigned b = 0; b < 8; b++)
         {
             putchar('0' + ((*d >> b)&1));
             if (b==3) putchar('_');
-            if (++btot >= f->len)
+            if (++btot >= len)
             {
                 putchar('\n');
                 return;
@@ -87,16 +87,62 @@ static void pretty_bin(const Fill *f)
     }
 }
 
+static void checksum(const Fill *restrict f)
+{
+    uint64_t cs[DISK_QUADS/2 + 1];
+    unsigned in_len = f->len, out_len;
+    const uint64_t *in_dat = f->data;
+
+    do
+    {
+        const uint64_t *din = in_dat;
+        unsigned bin = 0, bin_total = 0;
+        for (uint64_t *dout = cs;; dout++)
+        {
+            for (unsigned bout = 0; bout < 64; bout++)
+            {
+                uint64_t bit = !((
+                                     (*din >> bin) & 1
+                                 ) ^ (
+                                     (*din >> (bin+1)) & 1
+                                 )),
+                         mask = 1 << bout;
+                *dout = (*dout & ~mask) | (bit << bout);
+
+                bin_total += 2;
+                if (bin_total >= in_len)
+                    goto done;
+
+                bin += 2;
+                if (bin >= 64)
+                {
+                    bin = 0;
+                    din++;
+                }
+            }
+        }
+        done:
+        out_len = in_len/2;
+        printf("CS: ");
+        pretty_bin(cs, out_len);
+        printf("Len: %u\n\n", out_len);
+
+        in_dat = cs;
+        in_len = out_len;
+    } while (!(out_len & 1));
+
+}
+
 int main()
 {
     Fill fill;
-    const char *input = "10000"; // "10001001100000001"; // our input
+    const char *input = "10001001100000001"; // our input; use "10000" to test
     init_fill(&fill, input);
 
     printf("Disk bits: %u\n", DISK_BITS);
     printf("Disk quads: %u\n", DISK_QUADS);
     printf("Initial data: ");
-    pretty_bin(&fill);
+    pretty_bin(fill.data, fill.len);
     printf("Initial len: %u\n\n", fill.len);
 
     while (fill.len < DISK_BITS)
@@ -104,9 +150,11 @@ int main()
         fill_churn(&fill);
 
         printf("Data: ");
-        pretty_bin(&fill);
+        pretty_bin(fill.data, fill.len);
         printf("Len: %u\n\n", fill.len);
     }
+
+    checksum(&fill);
 
     return 0;
 }
