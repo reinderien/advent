@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,15 +24,14 @@ typedef struct
 
 static void init_fill(Fill *restrict f, const char *restrict input)
 {
-    memset(f->data, 0, DISK_WORDS*sizeof(Word));
+    memset(f, 0, sizeof(Fill));
 
     const char *c = input;
     for (Word *data = f->data;; data++)
     {
         for (Word b = 0; b < WORD_BITS; b++)
         {
-            if (!*c)
-                return;
+            if (!*c) return;
             *data |= (*c - '0') << b;
             f->len++;
             c++;
@@ -78,17 +78,17 @@ static void fill_churn(Fill *restrict f)
 static void pretty_bin(const Word *restrict data, unsigned len, bool sep)
 {
     unsigned btot = 0;
-    for (const uint8_t *d = (const uint8_t*)data;; d++)
+    for (const Word *d = data;; d++)
     {
-        for (unsigned b = 0; b < 8; b++)
+        for (unsigned b = 0; b < WORD_BITS; b++)
         {
             putchar('0' + ((*d >> b)&1));
-            if (sep && b==3) putchar('_');
             if (++btot >= len)
             {
                 putchar('\n');
                 return;
             }
+            if (sep && b%4 == 3) putchar('_');
         }
         if (sep) putchar(' ');
     }
@@ -135,10 +135,9 @@ static void checksum(const Fill *restrict f)
         in_len = out_len;
     } while (!(out_len & 1));
 
-
+    printf("CS bits: %u\n", out_len);
     printf("CS: ");
     pretty_bin(cs, out_len, false);
-    printf("CS bits: %u\n\n", out_len);
 }
 
 int main()
@@ -150,9 +149,11 @@ int main()
     printf("Word bits: %lu\n", WORD_BITS);
     printf("Disk bits: %u\n", DISK_BITS);
     printf("Disk words: %lu\n", DISK_WORDS);
+    printf("Initial bits: %u\n", fill.len);
+    assert(fill.len == strlen(input));
     printf("Initial data: ");
     pretty_bin(fill.data, fill.len, true);
-    printf("Initial bits: %u\n\n", fill.len);
+    putchar('\n');
 
     while (fill.len < DISK_BITS)
         fill_churn(&fill);
