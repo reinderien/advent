@@ -47,7 +47,7 @@ static unsigned count(const Word *row, unsigned nbits)
     }
 }
 
-static void evolve(Word *row, unsigned nwords)
+static void evolve(Word *row, unsigned nwords, unsigned nbits)
 {
     // lsb       msb
     // L xxxx_xxxx R
@@ -60,13 +60,17 @@ static void evolve(Word *row, unsigned nwords)
     {
         Word rcarry = row[i+1] << (WORD_BITS-1),
              next_lcarry = row[i] >> (WORD_BITS-1);
-        row[i] = (lcarry | (row[i] >> 1)) ^
-                 (rcarry | (row[i] << 1));
+
+        row[i] = (lcarry | (row[i] << 1)) ^
+                 (rcarry | (row[i] >> 1));
         lcarry = next_lcarry;
     }
 
-    row[i] = (lcarry | (row[i] >> 1)) ^
-             (row[i] << 1);
+    uint64_t last_mask = (1 << (nbits % WORD_BITS)) - 1;
+    row[i] = (
+                (lcarry | (row[i] << 1)) ^
+                (row[i] >> 1)
+             ) & last_mask;
 }
 
 static const char *print(const Word *row, unsigned nbits)
@@ -98,17 +102,12 @@ static Result run(const char *input, unsigned nrows)
 
     for (unsigned irow = 0; irow < nrows-1; irow++)
     {
-        const char *printed = print(row, nbits);
-        printf("Intermediate row: %s\n", printed);
-        free((void*)printed);
-
-        evolve(row, nwords);
+        evolve(row, nwords, nbits);
         total_safe += count(row, nbits);
     }
 
     const char *last = print(row, nbits);
-    printf(    "       Final row: %s\n"
-           "Safe total: %u\n\n", last, total_safe);
+    printf("Safe total: %u\n\n", total_safe);
 
     Result r = {.last = last,
                 .total_safe = total_safe};
@@ -119,17 +118,21 @@ int main()
 {
     Result r;
 
+    puts("Test 1");
     r = run("..^^.", 3);
     assert(!strcmp(r.last, "^^..^"));
     assert(r.total_safe == 6);
     free((void*)r.last);
 
+    puts("Test 2");
     r = run(".^^.^.^^^^", 10);
     assert(!strcmp(r.last, "^^.^^^..^^"));
     assert(r.total_safe == 38);
     free((void*)r.last);
 
-    // r = run("my input", 40);
+    puts("Part 1");
+    r = run("my input", 40);
+    free((void*)r.last);
 
     return 0;
 }
