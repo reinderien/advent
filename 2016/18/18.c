@@ -133,6 +133,7 @@ int main()
     puts("Part 1");
     r = run("my input", 40);
     free((void*)r.last);
+    // 320 is too low
 
     return 0;
 }
