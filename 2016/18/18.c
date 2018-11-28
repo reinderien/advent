@@ -131,9 +131,18 @@ int main()
     free((void*)r.last);
 
     puts("Part 1");
-    r = run("my input", 40);
+    const char *input =
+        ".^^..^...^..^^.^^^.^"
+        "^^.^^^^^^.^.^^^^.^^."
+        "^^^^^^.^...^......^."
+        "..^^^..^^^.....^^^^^"
+        "^^^^....^^...^^^^..^";
+    r = run(input, 40);
     free((void*)r.last);
-    // 320 is too low
+
+    puts("Part 2");
+    r = run(input, 400000);
+    free((void*)r.last);
 
     return 0;
 }
