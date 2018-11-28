@@ -11,7 +11,7 @@ typedef uint8_t Word;
 
 typedef struct
 {
-    char *last;
+    const char *last;
     unsigned total_safe;
 } Result;
 
@@ -69,23 +69,21 @@ static void evolve(Word *row, unsigned nwords)
              (row[i] << 1);
 }
 
-static void pretty_bin(const Word *row, unsigned nbits)
+static const char *print(const Word *row, unsigned nbits)
 {
-    unsigned i = 0;
-    for (const Word *d = row;; d++)
+    char *printed = malloc(nbits+1),
+         *p = printed;
+    const char *pend = p + nbits;
+    printed[nbits] = '\0';
+
+    for (const Word *r = row;; r++)
     {
-        for (unsigned b = 0; b < WORD_BITS; b++)
+        for (Word b = 1; b; b <<= 1)
         {
-            if (i++ >= nbits)
-            {
-                putchar('\n');
-                return;
-            }
-            putchar('0' + ((*d >> b) & 1));
-            if ((b % 4) == 3)
-                putchar('_');
+            if (p >= pend)
+                return printed;
+            *p++ = (*r & b) ? '^' : '.';
         }
-        putchar(' ');
     }
 }
 
@@ -100,15 +98,20 @@ static Result run(const char *input, unsigned nrows)
 
     for (unsigned irow = 0; irow < nrows-1; irow++)
     {
-        printf("Safe total so far: %u\n", total_safe);
-        pretty_bin(row, nbits);
-        putchar('\n');
+        const char *printed = print(row, nbits);
+        printf("Intermediate row: %s\n", printed);
+        free((void*)printed);
 
         evolve(row, nwords);
         total_safe += count(row, nbits);
     }
 
-    Result r = {.last = NULL, .total_safe = total_safe};
+    const char *last = print(row, nbits);
+    printf(    "       Final row: %s\n"
+           "Safe total: %u\n\n", last, total_safe);
+
+    Result r = {.last = last,
+                .total_safe = total_safe};
     return r;
 }
 
@@ -119,10 +122,12 @@ int main()
     r = run("..^^.", 3);
     assert(!strcmp(r.last, "^^..^"));
     assert(r.total_safe == 6);
+    free((void*)r.last);
 
     r = run(".^^.^.^^^^", 10);
     assert(!strcmp(r.last, "^^.^^^..^^"));
     assert(r.total_safe == 38);
+    free((void*)r.last);
 
     // r = run("my input", 40);
 
