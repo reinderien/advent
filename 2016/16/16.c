@@ -57,7 +57,8 @@ static void fill_churn(Fill *restrict f)
 
     for (; b_head < b_tail; b_head++, b_tail--)
     {
-        *d_tail |= ((Word)!(*d_head & m_head)) << o_tail;
+        Word bit = !(*d_head & m_head);
+        *d_tail |= bit << o_tail;
 
         m_head <<= 1;
         if (!m_head)
@@ -159,7 +160,7 @@ int main()
         fill_churn(&fill);
 
     // printf("Data: ");
-    // pretty_bin(fill.data, fill.len, TRUE);
+    // pretty_bin(fill.data, fill.len, true);
     printf("Data bits: %u\n\n", fill.len);
 
     checksum(&fill);
