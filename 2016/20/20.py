@@ -3,8 +3,7 @@
 from bisect import bisect_left
 
 
-def run(title, fname, expected=None):
-    print(title + ':')
+def load(fname):
     starts, ends = None, None
 
     with open(fname) as f:
@@ -57,14 +56,38 @@ def run(title, fname, expected=None):
             # assert(starts == list(sorted(starts)))
             # assert(ends == list(sorted(ends)))
 
+    return starts, ends
+
+
+def p1(starts, ends, exp):
     if starts[0] > 0:
         result = 0
     else:
         result = ends[0] + 1
-    print(result)
-    if expected is not None:
-        assert(result == expected)
+
+    print('Part 1: %u' % result)
+    if exp is not None:
+        assert(result == exp)
 
 
-run('Test', 'test_input.txt', 3)
-run('Part 1', 'input.txt', 23923783)
+def p2(starts, ends, exp):
+    total = sum(next_start - prev_end - 1
+                for prev_end, next_start in zip(
+                    [-1] + ends,
+                    starts + [0x100000000]
+                ))
+
+    print('Part 2: %u' % total)
+    if exp is not None:
+        assert(total == exp)
+
+
+def run(title, fname, exp1=None, exp2=None):
+    print(title + ':')
+    starts, ends = load(fname)
+    p1(starts, ends, exp1)
+    p2(starts, ends, exp2)
+
+
+run('Test', 'test_input.txt', 3, 0x100000000 - 8)
+run('Real', 'input.txt', 23923783, 125)
