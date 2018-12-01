@@ -1,0 +1,14 @@
+MD5 the following:
+
+   pxxbnzuo
+
+   Path so far (UDLR ...)
+
+Only keep the first four hex chars (16 bits) of the hash output:
+
+   U D L R
+
+   0-A: Closed + locked
+   B-F: Open
+
+Get from (0, 0) to (3, 3)
